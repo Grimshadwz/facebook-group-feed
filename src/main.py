@@ -7,17 +7,32 @@ load_dotenv()
 
 WEBHOOK_URL = os.getenv("WEBHOOK_URL")
 FACEBOOK_ID = os.getenv("FACEBOOK_ID")
-COOKIE_TXT = os.getenv("FACEBOOK_COOKIES")
+COOKIE_RAW = os.getenv("FACEBOOK_COOKIES", "")
 
-# Write the cookie string to a temporary file for the scraper to use
+# Parse the semicolon string manually into the proper Netscape file layout the library requires
+cookie_lines = [
+    "# Netscape HTTP Cookie File",
+    "# http://haxx.se",
+    "# This is a generated file! Do not edit.",
+    ""
+]
+
+# Break the string up by semicolons and build clean data rows
+for item in COOKIE_RAW.split(";"):
+    if "=" in item:
+        name, val = item.strip().split("=", 1)
+        # Format: domain, include_subdomains, path, secure, expiry, name, value
+        cookie_lines.append(f".facebook.com\tTRUE\t/\tTRUE\t0\t{name}\t{val}")
+
+# Write the formatted output out to cookies.txt
 with open("cookies.txt", "w") as f:
-    f.write(COOKIE_TXT if COOKIE_TXT else "")
+    f.write("\n".join(cookie_lines) + "\n")
 
 CH = channel.DiscordWebhookChannel(WEBHOOK_URL)
 print(f"Checking for new messages on page: {FACEBOOK_ID}...")
 
 try:
-    # Added cookies='cookies.txt' to bypass Meta blocks
+    # Run the scraper with our newly formatted file layout
     for post in get_posts(FACEBOOK_ID, pages=1, cookies="cookies.txt"):
         post_url = post.get('post_url', '')
         if post_url:
@@ -28,7 +43,7 @@ try:
 except Exception as e:
     print(f"Error fetching Facebook posts: {e}")
 
-# Clean up the cookie file
+# Clean up security variables
 if os.path.exists("cookies.txt"):
     os.remove("cookies.txt")
 
