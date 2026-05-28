@@ -25,6 +25,6 @@ jobs:
         
     - name: Run feed script
       env:
-        DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        DISCORD_WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}
         FACEBOOK_ID: ${{ secrets.FACEBOOK_ID }}
       run: python src/main.py
