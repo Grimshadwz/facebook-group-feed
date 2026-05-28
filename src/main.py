@@ -25,7 +25,7 @@ headers = {
 }
 
 print(f"Requesting public page timeline for: {FACEBOOK_ID}...")
-url = f"https://facebook.com{FACEBOOK_ID}"
+url = f"https://facebook.com{FACEBOOK_ID}""
 
 try:
     response = requests.get(url, headers=headers, timeout=15)
