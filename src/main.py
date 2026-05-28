@@ -1,6 +1,5 @@
 import os
 import re
-import json
 import base64
 import requests
 from dotenv import load_dotenv
@@ -24,38 +23,38 @@ headers = {
     'Cookie': COOKIE_RAW
 }
 
-print(f"Requesting public page timeline for: {FACEBOOK_ID}...")
-url = f"https://facebook.com{FACEBOOK_ID}"
+# Cleanly formatting the target string separately to guarantee it never mashes strings together
+clean_id = str(FACEBOOK_ID).strip().replace("/", "")
+url = f"https://facebook.com{clean_id}"
+
+print(f"Requesting public page timeline for ID: {clean_id}...")
 
 try:
     response = requests.get(url, headers=headers, timeout=15)
     html_content = response.text
     
-    # Track down any version of a Facebook post link pattern
     found_url = None
     
-    # Pattern 1: Standard story URLs
+    # Sweep for different standard web story layouts
     story_matches = re.findall(r'href="(/story\.php\?[^"]+)"', html_content)
     if story_matches:
         found_url = story_matches[0].replace("&amp;", "&")
     
-    # Pattern 2: Permalink / ID URLs
     if not found_url:
         permalink_matches = re.findall(r'href="(/permalink\.php\?[^"]+)"', html_content)
         if permalink_matches:
             found_url = permalink_matches[0].replace("&amp;", "&")
             
-    # Pattern 3: Modern direct path posts URLs
     if not found_url:
-        path_matches = re.findall(r'href="(/[^/]+/posts/[^"]+)"', html_content)
+        path_matches = re.findall(r'href="(/[^/]+/posts/[^"/?]+)"', html_content)
         if path_matches:
-            found_url = path_matches[0].split("?")[0] # Clean up parameters
+            found_url = path_matches[0]
 
     if found_url:
         full_post_url = f"https://facebook.com{found_url}"
-        print(f"Post pattern match identified: {full_post_url}")
+        print(f"Match found! Direct Link: {full_post_url}")
         
-        # Fire the message over to the Discord Webhook directly
+        # Fire direct JSON to the webhook address 
         payload = {"content": f"Check out my latest Facebook post: {full_post_url}"}
         discord_response = requests.post(WEBHOOK_URL, json=payload, timeout=10)
         
@@ -64,7 +63,7 @@ try:
         else:
             print(f"Discord Webhook rejected request with status: {discord_response.status_code}")
     else:
-        print("No new recent timeline posts identified in the current layout layout view.")
+        print("No new recent timeline posts identified in the current layout view.")
 
 except Exception as e:
     print(f"Error executing web transfer check: {e}")
