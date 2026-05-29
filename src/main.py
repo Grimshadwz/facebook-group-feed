@@ -1,12 +1,11 @@
 import os
-import re
 import base64
 import requests
 from dotenv import load_dotenv
+from bs4 import BeautifulSoup
 
 load_dotenv()
 
-# Hardcoded to absolutely guarantee no string mashing can happen
 WEBHOOK_URL = os.getenv("WEBHOOK_URL")
 FACEBOOK_ID = "RatchetArtStudio"
 COOKIE_B64 = os.getenv("FACEBOOK_COOKIES", "")
@@ -24,35 +23,34 @@ headers = {
     'Cookie': COOKIE_RAW
 }
 
-url = f"https://mbasic.facebook.com/{FACEBOOK_ID}"
+url = f"https://facebook.com{FACEBOOK_ID}"
 print(f"Requesting public page timeline for ID: {FACEBOOK_ID}...")
 
 try:
     response = requests.get(url, headers=headers, timeout=15)
-    html_content = response.text
+    soup = BeautifulSoup(response.text, 'html.parser')
     
     found_url = None
     
-    # Sweep for different standard web story layouts
-    story_matches = re.findall(r'href="(/story\.php\?[^"]+)"', html_content)
-    if story_matches:
-        found_url = story_matches[0].replace("&amp;", "&")
-    
-    if not found_url:
-        permalink_matches = re.findall(r'href="(/permalink\.php\?[^"]+)"', html_content)
-        if permalink_matches:
-            found_url = permalink_matches[0].replace("&amp;", "&")
-            
-    if not found_url:
-        path_matches = re.findall(r'href="(/[^/]+/posts/[^"/?]+)"', html_content)
-        if path_matches:
-            found_url = path_matches[0]
+    # Scan every single link element on the page using a formal HTML parser engine
+    for link in soup.find_all('a', href=True):
+        href = link['href']
+        
+        # Identify standard timeline update links
+        if "/story.php" in href or "/permalink.php" in href or "/posts/" in href:
+            found_url = href.split("?")[0] if "/posts/" in href else href
+            break
+        # Identify image uploads / standalone photo link layouts
+        elif "/photo.php" in href or "/photos/" in href:
+            found_url = href
+            break
 
     if found_url:
-        full_post_url = f"https://www.facebook.com{found_url}"
+        clean_path = found_url.replace("&amp;", "&")
+        # Build the final desktop-friendly Facebook post URL address
+        full_post_url = f"https://facebook.com{clean_path}" if clean_path.startswith("/") else clean_path
         print(f"Match found! Direct Link: {full_post_url}")
         
-        # Fixed syntax conditional evaluation line here
         payload = {"content": f"Check out my latest Facebook post: {full_post_url}"}
         discord_response = requests.post(WEBHOOK_URL, json=payload, timeout=10)
         
@@ -62,6 +60,8 @@ try:
             print(f"Discord Webhook rejected request with status: {discord_response.status_code}")
     else:
         print("No new recent timeline posts identified in the current layout view.")
+        print("--- PAGE DATA SNIPPET FOR DEBUGGING ---")
+        print(response.text[:1000].replace('\n', ' '))
 
 except Exception as e:
     print(f"Error executing web transfer check: {e}")
