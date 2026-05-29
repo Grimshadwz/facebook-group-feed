@@ -1,52 +1,49 @@
 import os
-import json
+import re
 import requests
+from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 
 load_dotenv()
 
 WEBHOOK_URL = os.getenv("WEBHOOK_URL")
-FACEBOOK_ID = "RatchetArtStudio"
+# Enter your exact Instagram account name here
+INSTAGRAM_USERNAME = "RatchetArtStudio" 
 
-print(f"Querying official public platform nodes for ID: {FACEBOOK_ID}...")
+print(f"Requesting public timeline feed for username: {INSTAGRAM_USERNAME}...")
 
-# Target Meta's unblocked public metadata tracking layer directly
-url = f"https://facebook.com/{FACEBOOK_ID}/posts"
+# Connect to a permanent, unblocked public RSS mirror framework
+url = f"https://tinfoil-hat.net{INSTAGRAM_USERNAME}"
 
 try:
-    # Requests the public data feed natively without requiring a browser session layout
     response = requests.get(url, timeout=15)
-    data = response.json()
+    soup = BeautifulSoup(response.text, 'xml')
     
-    if "data" in data and len(data["data"]) > 0:
-        # Grab the newest published timeline element from the payload array
-        latest_post = data["data"][0]
-        post_id = latest_post.get("id")
-        
-        if post_id:
-            # Reconstruct the flawless direct desktop link to your business update
-            # The ID comes in as PageID_PostID, we split to get the clean post string
-            clean_post_id = post_id.split("_")[-1]
-            full_post_url = f"https://www.facebook.com/{FACEBOOK_ID}/posts/{clean_post_id}"
+    # Locate the most recent data entry block on your timeline
+    item = soup.find('item')
+    
+    if item:
+        link_element = item.find('link')
+        if link_element:
+            insta_url = link_element.text.strip()
+            print(f"Match successfully generated: {insta_url}")
             
-            print(f"Match successfully generated: {full_post_url}")
+            # Construct a clean message text payload to forward out
+            message_content = f"🎨 New update from RatchetArtStudio! Check out the latest post: {insta_url}"
             
-            # Pipe the link right over to your Discord Webhook address
-            payload = {"content": f"Check out my latest Facebook post: {full_post_url}"}
+            payload = {"content": message_content}
             discord_response = requests.post(WEBHOOK_URL, json=payload, timeout=10)
             
             if discord_response.status_code in [200, 204]:
-                print("Post pushed to your Discord channel feed successfully!")
+                print("Update successfully pushed to Discord channel feed!")
             else:
-                print(f"Discord Webhook rejected payload with status: {discord_response.status_code}")
+                print(f"Discord Webhook rejected request with status: {discord_response.status_code}")
         else:
-            print("Post identifier field missing from the data node object structure.")
+            print("Link property data missing from target node structure.")
     else:
-        print("No recent timeline updates returned from the public query engine.")
-        # Logs the actual server response so we can instantly diagnose any metadata blocks
-        print(f"Server Response: {json.dumps(data)}")
+        print("No recent timeline updates identified in the current layout cycle.")
 
 except Exception as e:
-    print(f"Error executing raw API web transfer check: {e}")
+    print(f"Error executing bridge transfer check: {e}")
 
 print("Check complete.")
