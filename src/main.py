@@ -11,7 +11,7 @@ FACEBOOK_ID = "RatchetArtStudio"
 print(f"Querying official public platform nodes for ID: {FACEBOOK_ID}...")
 
 # Target Meta's unblocked public metadata tracking layer directly
-url = f"https://facebook.com{FACEBOOK_ID}/posts"
+url = f"https://facebook.com/{FACEBOOK_ID}/posts"
 
 try:
     # Requests the public data feed natively without requiring a browser session layout
