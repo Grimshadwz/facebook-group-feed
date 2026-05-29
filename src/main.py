@@ -12,7 +12,7 @@ INSTAGRAM_USERNAME = "southern_backwoodz"
 print(f"Directly querying public timeline layout for: {INSTAGRAM_USERNAME}...")
 
 # Pull directly from Instagram's native public display node instead of a proxy server
-url = f"https://instagram.com{INSTAGRAM_USERNAME}/"
+url = f"https://instagram.com/{INSTAGRAM_USERNAME}/"
 
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
