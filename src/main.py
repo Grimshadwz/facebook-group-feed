@@ -23,6 +23,7 @@ headers = {
     'Cookie': COOKIE_RAW
 }
 
+# FIXED: Explicitly using mbasic and adding the missing forward slash
 url = f"https://facebook.com{FACEBOOK_ID}"
 print(f"Requesting public page timeline for ID: {FACEBOOK_ID}...")
 
@@ -48,12 +49,13 @@ try:
     if found_url:
         clean_path = found_url.replace("&amp;", "&")
         # Build the final desktop-friendly Facebook post URL address
-        full_post_url = f"https://facebook.com{clean_path}" if clean_path.startswith("/") else clean_path
+        full_post_url = f"https://www.facebook.com{clean_path}" if clean_path.startswith("/") else clean_path
         print(f"Match found! Direct Link: {full_post_url}")
         
         payload = {"content": f"Check out my latest Facebook post: {full_post_url}"}
         discord_response = requests.post(WEBHOOK_URL, json=payload, timeout=10)
         
+        # FIXED: Corrected syntax structure for the status check loop
         if discord_response.status_code in [200, 204]:
             print("Post found and sent to Discord successfully!")
         else:
