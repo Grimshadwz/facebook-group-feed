@@ -24,7 +24,7 @@ headers = {
 }
 
 # FIXED: Explicitly using mbasic and adding the missing forward slash
-url = f"https://facebook.com{FACEBOOK_ID}"
+url = f"https://facebook.com/{FACEBOOK_ID}"
 print(f"Requesting public page timeline for ID: {FACEBOOK_ID}...")
 
 try:
