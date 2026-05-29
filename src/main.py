@@ -13,7 +13,7 @@ INSTAGRAM_USERNAME = "southern_backwoodz"
 print(f"Requesting public timeline feed for username: {INSTAGRAM_USERNAME}...")
 
 # Connect to a permanent, unblocked public RSS mirror framework
-url = f"https://tinfoil-hat.net{INSTAGRAM_USERNAME}"
+url = f"https://tinfoil-hat.net/{INSTAGRAM_USERNAME}"
 
 try:
     response = requests.get(url, timeout=15)
