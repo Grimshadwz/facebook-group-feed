@@ -11,7 +11,7 @@ FACEBOOK_ID = "RatchetArtStudio"
 print(f"Requesting clean open-source timeline tracking for: {FACEBOOK_ID}...")
 
 # Connect directly to the community-maintained free RSSHub database node
-url = f"https://rsshub.app{FACEBOOK_ID}"
+url = f"https://rsshub.app/{FACEBOOK_ID}"
 
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
