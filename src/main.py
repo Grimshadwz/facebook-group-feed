@@ -33,7 +33,7 @@ try:
     if post_ids:
         # Grab the newest clean numerical identifier found in the code array
         latest_post_id = post_ids[0]
-        full_post_url = f"https://facebook.com{FACEBOOK_ID}/posts/{latest_post_id}"
+        full_post_url = f"https://facebook.com/{FACEBOOK_ID}/posts/{latest_post_id}"
         print(f"Flawless link generated out of memory: {full_post_url}")
         
         # Dispatch the link string directly over to your Discord server webhook channel
