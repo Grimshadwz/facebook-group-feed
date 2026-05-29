@@ -8,7 +8,7 @@ load_dotenv()
 
 WEBHOOK_URL = os.getenv("WEBHOOK_URL")
 # Enter your exact Instagram account name here
-INSTAGRAM_USERNAME = "RatchetArtStudio" 
+INSTAGRAM_USERNAME = "southern_backwoodz" 
 
 print(f"Requesting public timeline feed for username: {INSTAGRAM_USERNAME}...")
 
