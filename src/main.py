@@ -11,7 +11,7 @@ FACEBOOK_ID = "RatchetArtStudio"
 print(f"Directly checking public web elements for page: {FACEBOOK_ID}...")
 
 # Target the clean profile page structure layout natively
-url = f"https://facebook.com{FACEBOOK_ID}"
+url = f"https://facebook.com/{FACEBOOK_ID}"
 
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
