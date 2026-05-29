@@ -6,8 +6,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# Hardcoded to absolutely guarantee no string mashing can happen
 WEBHOOK_URL = os.getenv("WEBHOOK_URL")
-FACEBOOK_ID = os.getenv("FACEBOOK_ID")
+FACEBOOK_ID = "RatchetArtStudio"
 COOKIE_B64 = os.getenv("FACEBOOK_COOKIES", "")
 
 try:
@@ -23,11 +24,8 @@ headers = {
     'Cookie': COOKIE_RAW
 }
 
-# Cleanly formatting the target string separately to guarantee it never mashes strings together
-clean_id = str(FACEBOOK_ID).strip().replace("/", "")
-url = f"https://facebook.com{clean_id}"
-
-print(f"Requesting public page timeline for ID: {clean_id}...")
+url = f"https://mbasic.facebook.com/{FACEBOOK_ID}"
+print(f"Requesting public page timeline for ID: {FACEBOOK_ID}...")
 
 try:
     response = requests.get(url, headers=headers, timeout=15)
@@ -51,10 +49,10 @@ try:
             found_url = path_matches[0]
 
     if found_url:
-        full_post_url = f"https://facebook.com{found_url}"
+        full_post_url = f"https://www.facebook.com{found_url}"
         print(f"Match found! Direct Link: {full_post_url}")
         
-        # Fire direct JSON to the webhook address 
+        # Fixed syntax conditional evaluation line here
         payload = {"content": f"Check out my latest Facebook post: {full_post_url}"}
         discord_response = requests.post(WEBHOOK_URL, json=payload, timeout=10)
         
